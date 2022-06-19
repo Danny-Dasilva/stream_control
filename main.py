@@ -5,18 +5,20 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi import WebSocket
 from fastapi.templating import Jinja2Templates
-
+from pydantic import BaseModel
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+class ToDoRequest(BaseModel):
+    task: str
 
 marks = ["se", ]
 # with open('measurements.json', 'r') as file:
     # measurements = iter(json.loads(file.read()))
-@app.get("/set")
-def set_values(value: str):
-    marks.append(value)
+@app.post("/set")
+def set_values(value:ToDoRequest):
+    marks.append(value.task)
     return value
 
 
@@ -31,8 +33,10 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         await asyncio.sleep(0.1)
         if len(marks) > 0:
-            payload = next(marks)
-            await websocket.send_json(payload)
+            payload = next(iter(marks))
+            print(payload, "aaaaaa")
+            await websocket.send_json({"value":payload})
+            marks.remove(payload)
 
 def main():
     uvicorn.run(
