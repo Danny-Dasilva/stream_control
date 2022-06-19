@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Real time streaming</title>
+  </head>
+  <body>
+    <div id="six"></div>
+
+    <button type="button" onclick="myFunction('restart')">Restart</button>
+    <button type="button" onclick="myFunction('start')">Start</button>
+    <button type="button" onclick="myFunction('pause')">Pause</button>
+    <button type="button" onclick="myFunction('stop')">Stop</button>
+    <script>
+      const ws = new WebSocket("ws://localhost:8000/ws");
+      function myFunction(event) {
+        console.log(event);
+      }
+      ws.onmessage = function (event) {
+        const measurement = JSON.parse(event.data);
+        //console.log(measurement.value);
+        document.getElementById("six").innerHTML = measurement.value;
+      };
+    </script>
+  </body>
+</html>
